@@ -1,18 +1,14 @@
 const socket = io();
 let peerConnection;
 let localStream;
-const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+let username = '';
+const config = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-let username = prompt("Enter your reporter name for BT News:");
-socket.emit("set-username", username);
-
-// Prevent screen timeout
-if ("wakeLock" in navigator) {
-  let wakeLock = null;
+// Wake Lock for mobile
+if ('wakeLock' in navigator) {
+  let wakeLock;
   const requestLock = async () => {
-    try {
-      wakeLock = await navigator.wakeLock.request("screen");
-    } catch (err) { console.warn("Wake Lock error:", err); }
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
   };
   requestLock();
   document.addEventListener("visibilitychange", () => {
@@ -20,35 +16,40 @@ if ("wakeLock" in navigator) {
   });
 }
 
-// Get media stream on load
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  .then(stream => {
-    localStream = stream;
-    // We won't show local video, but we must keep the stream for connection setup
-  })
-  .catch(err => {
-    console.error("Failed to get media:", err);
-    alert("Media access blocked.");
-  });
+// Join button logic
+document.getElementById('joinBtn').onclick = () => {
+  const nameInput = document.getElementById('username').value.trim();
+  if (!nameInput) return alert('Please enter a camera name');
+  username = nameInput;
+  socket.emit('set-username', username);
 
-const usersDiv = document.getElementById("users");
-const remoteVideo = document.getElementById("remoteVideo");
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      localStream = stream;
+    })
+    .catch(err => {
+      console.error('Media error:', err);
+      alert('Unable to access camera/mic.');
+    });
+};
 
-// Show reporters
-socket.on("update-users", userMap => {
-  usersDiv.innerHTML = "";
-  Object.entries(userMap).forEach(([id, name]) => {
+// Populate camera list
+socket.on('update-users', users => {
+  const list = document.getElementById('cameraOptions');
+  list.innerHTML = '';
+  Object.entries(users).forEach(([id, name]) => {
     if (id !== socket.id) {
-      const div = document.createElement("div");
-      div.className = "user";
-      div.textContent = name;
-      div.onclick = () => startCall(id);
-      usersDiv.appendChild(div);
+      const item = document.createElement('li');
+      item.textContent = name;
+      item.onclick = () => startCall(id);
+      list.appendChild(item);
     }
   });
 });
 
 function startCall(targetId) {
+  if (!localStream) return alert('Join first and allow camera access');
+
   if (peerConnection) {
     peerConnection.close();
     peerConnection = null;
@@ -56,59 +57,35 @@ function startCall(targetId) {
 
   peerConnection = new RTCPeerConnection(config);
 
-  // Add local tracks — even if you don’t show local video!
-  localStream.getTracks().forEach(track => {
-    peerConnection.addTrack(track, localStream);
-  });
-
-  peerConnection.ontrack = event => {
-    remoteVideo.srcObject = event.streams[0];
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+  peerConnection.ontrack = e => {
+    document.getElementById('cameraView').srcObject = e.streams[0];
   };
-
   peerConnection.onicecandidate = e => {
-    if (e.candidate) {
-      socket.emit("signal", targetId, { candidate: e.candidate });
-    }
-  };
-
-  peerConnection.onconnectionstatechange = () => {
-    console.log("State:", peerConnection.connectionState);
+    if (e.candidate) socket.emit('signal', targetId, { candidate: e.candidate });
   };
 
   peerConnection.createOffer()
-    .then(offer => peerConnection.setLocalDescription(offer))
-    .then(() => {
-      socket.emit("call-user", targetId);
-      socket.emit("signal", targetId, { offer: peerConnection.localDescription });
+    .then(offer => {
+      peerConnection.setLocalDescription(offer);
+      socket.emit('call-user', targetId);
+      socket.emit('signal', targetId, { offer });
     });
 }
 
-// Incoming call
-socket.on("incoming-call", callerId => {
-  if (peerConnection) {
-    peerConnection.close();
-    peerConnection = null;
-  }
-
+socket.on('incoming-call', callerId => {
   peerConnection = new RTCPeerConnection(config);
 
-  localStream.getTracks().forEach(track => {
-    peerConnection.addTrack(track, localStream);
-  });
-
-  peerConnection.ontrack = event => {
-    remoteVideo.srcObject = event.streams[0];
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+  peerConnection.ontrack = e => {
+    document.getElementById('cameraView').srcObject = e.streams[0];
   };
-
   peerConnection.onicecandidate = e => {
-    if (e.candidate) {
-      socket.emit("signal", callerId, { candidate: e.candidate });
-    }
+    if (e.candidate) socket.emit('signal', callerId, { candidate: e.candidate });
   };
 });
 
-// Handle signal
-socket.on("signal", (fromId, data) => {
+socket.on('signal', (fromId, data) => {
   if (!peerConnection) return;
 
   if (data.offer) {
@@ -116,15 +93,11 @@ socket.on("signal", (fromId, data) => {
       .then(() => peerConnection.createAnswer())
       .then(answer => {
         peerConnection.setLocalDescription(answer);
-        socket.emit("signal", fromId, { answer });
+        socket.emit('signal', fromId, { answer });
       });
-  }
-
-  if (data.answer && peerConnection.signalingState === "have-local-offer") {
+  } else if (data.answer) {
     peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-  }
-
-  if (data.candidate) {
+  } else if (data.candidate) {
     peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
   }
 });
