@@ -1,71 +1,129 @@
-/* Core Colors */
 :root {
   --bt-red: rgb(183, 28, 28);
   --bt-white: #fff;
-  --bt-dark: #222;
-  --bt-grey: #eee;
+  --bt-light: #f9f9f9;
+  --bt-grey: #ddd;
 }
 
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-color: var(--bt-grey);
-  color: var(--bt-dark);
+  background-color: var(--bt-light);
+  color: var(--bt-red);
 }
 
 header {
   background-color: var(--bt-red);
   color: var(--bt-white);
   text-align: center;
-  padding: 1em 0;
+  padding: 1em;
 }
 
-header h1 {
+h1 {
   margin: 0;
   font-size: 2.5em;
-  letter-spacing: 2px;
 }
 
 .tagline {
-  margin-top: 0.5em;
   font-style: italic;
+  margin-top: 0.4em;
+  font-size: 1.1em;
 }
 
-.video-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 2em;
+main {
+  padding: 1em;
+}
+
+.video-section {
+  text-align: center;
+  margin-bottom: 1em;
 }
 
 video {
-  width: 45%;
-  border: 3px solid var(--bt-red);
-  border-radius: 8px;
+  width: 80%;
+  border: 4px solid var(--bt-red);
+  border-radius: 12px;
+  background-color: black;
+}
+
+.marquee {
+  width: 80%;
+  margin: 1em auto 2em;
+  background-color: var(--bt-red);
+  color: var(--bt-white);
+  font-weight: bold;
+  padding: 0.6em;
+  border-radius: 5px;
 }
 
 .username-box {
   text-align: center;
-  margin: 2em 0;
+  margin: 1em 0 3em;
 }
 
-input, button {
+.alert-box {
+  background-color: var(--bt-red);
+  color: var(--bt-white);
+  padding: 0.8em;
+  margin-bottom: 0.8em;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+input {
   padding: 0.6em;
   font-size: 1em;
-  margin: 0.5em;
-  border-radius: 5px;
   border: 2px solid var(--bt-red);
+  border-radius: 6px;
+  width: 240px;
 }
 
 button {
+  margin-left: 10px;
+  padding: 0.6em 1em;
+  font-size: 1em;
+  border: none;
+  border-radius: 6px;
   background-color: var(--bt-red);
   color: var(--bt-white);
   cursor: pointer;
+}
+
+.camera-list {
+  width: 80%;
+  margin: 0 auto 3em;
+  background-color: var(--bt-grey);
+  padding: 1.5em;
+  border-radius: 10px;
+}
+
+.camera-list h2 {
+  margin-top: 0;
+}
+
+#cameraOptions {
+  list-style: none;
+  padding: 0;
+}
+
+#cameraOptions li {
+  margin: 0.5em 0;
+  padding: 0.8em;
+  background-color: var(--bt-white);
+  border: 2px solid var(--bt-red);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#cameraOptions li:hover {
+  background-color: var(--bt-red);
+  color: var(--bt-white);
 }
 
 footer {
   background-color: var(--bt-red);
   color: var(--bt-white);
   text-align: center;
-  padding: 1em 0;
+  padding: 1em;
 }
