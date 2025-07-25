@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BT Newsroom 🔴</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>📰 BT News</h1>
+
+    <marquee behavior="scroll" direction="left" scrollamount="8">
+      Welcome to BT Newsroom! Click a reporter below to go live with them 🐢🎤📡
+    </marquee>
+
+    <h3>Who's online:</h3>
+    <div id="users"></div>
+
+    <video id="remoteVideo" autoplay playsinline></video>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>

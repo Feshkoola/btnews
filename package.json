@@ -1,0 +1,13 @@
+{
+  "name": "btnews",
+  "version": "1.0.0",
+  "description": "BT News - One-on-one reporter video system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}
