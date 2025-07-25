@@ -4,30 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BT News</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <header>
     <h1>BT News</h1>
-    <p class="tagline">Live from the Shell!</p>
+    <p class="tagline">Shellcast powered by WebRTC 🐢📡</p>
   </header>
 
   <main>
-    <div class="video-container">
-      <video id="localVideo" autoplay muted></video>
-      <video id="remoteVideo" autoplay></video>
+    <div class="video-section">
+      <video id="cameraView" autoplay playsinline></video>
+      <div class="marquee">
+        <marquee scrollamount="6">📣 Breaking News: BTCall is live — click below to join a camera feed!</marquee>
+      </div>
     </div>
+
     <div class="username-box">
-      <label for="username">Username:</label>
-      <input type="text" id="username" placeholder="Enter your newsroom name..." />
-      <button id="joinBtn">Join Call</button>
+      <div class="alert-box">⚠️ Choose your camera name before joining</div>
+      <input type="text" id="username" placeholder="e.g., TurtleCam01" />
+      <button id="joinBtn">Join Newsroom</button>
+    </div>
+
+    <div class="camera-list">
+      <h2>Select a Live Camera:</h2>
+      <ul id="cameraOptions"></ul>
     </div>
   </main>
 
   <footer>
-    <p>BTCall powered by WebRTC 🐢</p>
+    <p>BT Newsroom — Secure Shell Broadcast 🐢🔴</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/client.js"></script>
 </body>
 </html>
